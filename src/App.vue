@@ -1,32 +1,47 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <Header />
+    <router-view class="router-view"></router-view>
+    <!-- 播放器 -->
+    <audio ref="player"></audio>
   </div>
 </template>
-
-<style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script>
+import Header from '@/components/Header'
+import { defaultSheetId } from '@/config'
+import { getPlaylistDetail } from '@/api'
+import { mapActions } from 'vuex'
+export default {
+  components: {
+    Header
+  },
+  created () {
+    // 获取正在播放列表
+    getPlaylistDetail(defaultSheetId).then(playlist => {
+      const list = playlist.tracks.slice(0, 100)
+      this.setPlaylist({ list })
+    })
+  },
+  methods: {
+    ...mapActions('song', ['setPlaylist'])
+  }
 }
+</script>
+<style lang="less" scoped>
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: @text_color;
+  font-size: @font_size_medium;
 
-#nav {
-  padding: 30px;
+  .router-view {
+    width: 100%;
+    height: 100%;
+  }
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+  audio {
+    position: fixed;
   }
 }
 </style>
